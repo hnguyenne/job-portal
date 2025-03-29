@@ -5,6 +5,7 @@ import com.jobportal.job_portal_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.jobportal.job_portal_backend.utils.JwtUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -12,6 +13,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final JwtUtil jwtUtil;
 
     public User registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -21,7 +23,7 @@ public class UserService {
     public String login(User user) {
         User existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser != null && passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            return "JWT_TOKEN_PLACEHOLDER"; // add JWT implementation later
+            return jwtUtil.generateToken(existingUser.getEmail());
         }
         return null;
     }
